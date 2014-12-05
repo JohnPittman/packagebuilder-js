@@ -1,5 +1,5 @@
-package-builder-js
-==================
+packagebuilder-js
+=================
 
 Node module for cranking out JavaScript packages. Builds with front-end source maps, tests, minifies, and versioning.
 
