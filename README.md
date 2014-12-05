@@ -19,6 +19,9 @@ Each process is dependent upon the previous. If one fails the build process exit
 - gulp test (Unit specifications)
 - gulp build (Test, folder clean-ups, minification, source maps, renaming)
 - gulp deploy (Test, build, versioning)
+- gulp deploy--version-down
+
+Note: Look through the packagebuilder.js module for more commands, however, the main ones just use others as helper tasks to fix things the they couldn't could not do as one. Things like the deploy--version-down task was made because I bump the version by the wrong type sometimes and would have to go into each file to change and save then re-run gulp deploy so it makes it less tidious.
 
 <h1>Usage</h1>
 
@@ -28,12 +31,15 @@ npm: npm install packagebuilder
 
 <h4>How to use...</h4>
 
-- Create gulpfile.js in the root project directory.
+- npm install gulp --save-dev. (recommended to put the version as '*' to always install the latest)
 - npm install packagebuilder --save-dev. (recommended to put the version as '*' to always install the latest)
-- In the gulpfile.js:
+- Create gulpfile.js in the root directory of the project this is being used for.
+- In the gulpfile.js copy and paste this line:
 
-    var gulp = require('gulp');
-    var packagebuilder = require('packagebuilder');
-    packagebuilder(gulp);
+    require('packagebuilder')(require('gulp'));
+
+Now you can open up a terminal in the project folder and run any of the gulp tasks listed in the Gulp Commands section above on the project.
 
 <h1>Release Notes</h1>
+
+To be continued... The goal is to eventually have an initial setup run through to configure the paths of source and distribution so this can be use for large web projects as well.

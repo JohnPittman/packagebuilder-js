@@ -1,6 +1,6 @@
 {
     "name": "packagebuilder",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Module to load gulp tasks for testing, minifying, versioning JavaScript packages.",
     "main": "src/packagebuilder.js",
     "files": [
