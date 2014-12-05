@@ -40,8 +40,8 @@ npm: npm install packagebuilder
 
 Now you can open up a terminal in the project folder and run any of the gulp tasks listed in the Gulp Commands section above on the project.
 
-Note: Right now the source directory that the build needs is src/ in the main project directory which the build needs to start the processes. You can change the locations of source files, distribution folder, etc. manually in the config.js that's included in the packagebuilder module under node_modules. This will be overwritten each time you reinstalled the package at the moment.
+Note: Right now the source directory that the build needs is src/ in the main project directory which is the location of all the JavaScript that needs to get processed in the build task. You can change the locations of source files, distribution folder, etc. manually in the config.js that's included in the packagebuilder module under node_modules. However, this will be overwritten each time you reinstalled the package at the moment.
 
 <h1>Release Notes</h1>
 
-To be continued... The goal is to eventually have an initial setup run through to configure the paths of source and distribution so this can be use for large web projects as well.
+To be continued... The goal is to eventually have an initial setup when running "gulp" to configure the paths of source and distribution so this can be use for large web projects as well. For the time being the main purpose of this is for cranking out JavaScript packages for both npm and bower.
