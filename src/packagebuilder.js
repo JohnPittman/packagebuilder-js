@@ -8,6 +8,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var prompt = require('gulp-prompt');
 var recursiveread = require('recursive-readdir');
 var beautify = require('gulp-beautify');
+var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
 
@@ -137,7 +138,7 @@ module.exports = function(gulp) {
     });
 
     // Minify JS with source maps and generate source maps.
-    gulp.task('build--compress', ['build--clean-dist'], function() {
+    gulp.task('build--compress-min', ['build--clean-dist'], function() {
         return gulp.src(config.paths.JS_SRC)
             .pipe(rename(function(path) {
                 path.extname = '.min.js'
@@ -150,8 +151,21 @@ module.exports = function(gulp) {
             .pipe(gulp.dest(config.paths.DIST));
     });
 
+    // Minify JS with source maps and generate source maps.
+    gulp.task('build--compress-gzip', ['build--compress-min'], function() {
+        return gulp.src(config.paths.JS_DIST)
+            .pipe(rename(function(path) {
+                path.extname = ''
+            }))
+            .pipe(gzip({
+                append: true,
+                threshold: true
+            }))
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
     // Rename .min.js.map files to .min.map.
-    gulp.task('build--rename-sourcemaps', ['build--compress'], function() {
+    gulp.task('build--rename-sourcemaps', ['build--compress-gzip'], function() {
         return gulp.src(config.paths.SOURCE_MAPS)
             .pipe(rename(function(path) {
                 path.basename = path.basename.split('.')[0],
