@@ -27,7 +27,7 @@ Note: Look through the packagebuilder.js module for more commands, however, the 
 
 <h4>Installation</h4>
 
-npm: npm install packagebuilder
+npm: npm install chickendinosaur-packagebuilder
 
 <h4>How to use...</h4>
 
@@ -36,7 +36,7 @@ npm: npm install packagebuilder
 - Create gulpfile.js in the root directory of the project this is being used for.
 - In the gulpfile.js copy and paste this line:
 
-    require('packagebuilder')(require('gulp'));
+    require('chickendinosaur-packagebuilder')(require('gulp'));
 
 Now you can open up a terminal in the project folder and run any of the gulp tasks listed in the Gulp Commands section above on the project.
 
@@ -44,12 +44,4 @@ Note: Right now the source directory that the build needs is src/ in the main pr
 
 <h1>Release Notes</h1>
 
-<h4>v0.0.4</h4>
-
-- Bug fix: No longer errors on version bump if one of the package or bower .json files does not exist.
-
-<h4>v0.0.3</h4>
-
-- Added a .gz gzip compressed output file to the distribution.
-
-To be continued... The goal is to eventually have an initial setup when running "gulp" to configure the paths of source and distribution so this can be use for large web projects as well. For the time being the main purpose of this is for cranking out JavaScript packages for both npm and bower.
+<h4>v0.0.1</h4>

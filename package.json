@@ -1,14 +1,14 @@
 {
-    "name": "packagebuilder",
-    "version": "0.0.4",
-    "description": "Module to load gulp tasks for testing, minifying, versioning JavaScript packages.",
+    "name": "chickendinosaur-packagebuilder",
+    "version": "0.0.1",
+    "description": "Module to load gulp tasks for testing, minifying, versioning JavaScript packages as well as other file types.",
     "main": "src/packagebuilder.js",
     "files": ["src/", "config.js", "LICENSE", "README"],
     "repository": {
         "type": "git",
         "url": "https://github.com/JohnPittman/packagebuilder-js.git"
     },
-    "keywords": ["js", "javascript", "chickendinosaur-packagebuilder", "packagebuilder", "automated", "testing", "minify", "deploy"],
+    "keywords": ["js", "javascript", "chickendinosaur", "packagebuilder", "automated", "testing", "minify", "deploy"],
     "author": "John Pittman",
     "license": "MIT",
     "bugs": {
