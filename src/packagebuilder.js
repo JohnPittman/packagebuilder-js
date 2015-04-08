@@ -12,7 +12,7 @@ var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
 
-var config = require('./../config');
+var config = require('./../config.js');
 
 module.exports = function(gulp) {
 
@@ -91,8 +91,10 @@ module.exports = function(gulp) {
                 choices: ['patch', 'minor', 'major'],
             }, function(res) {
                 var bumpType = res.bump[0];
-                updateVersion(bumpType, 'package.json');
-                updateVersion(bumpType, 'bower.json');
+                if (fs.existsSync('package.json') === true)
+                    updateVersion(bumpType, 'package.json');
+                if (fs.existsSync('bower.json') === true)
+                    updateVersion(bumpType, 'bower.json');
             }));
 
         return cb();
@@ -159,7 +161,7 @@ module.exports = function(gulp) {
             }))
             .pipe(gzip({
                 append: true,
-                threshold: true
+                threshold: false
             }))
             .pipe(gulp.dest(config.paths.DIST));
     });

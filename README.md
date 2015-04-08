@@ -44,6 +44,10 @@ Note: Right now the source directory that the build needs is src/ in the main pr
 
 <h1>Release Notes</h1>
 
+<h4>v0.0.4</h4>
+
+- Bug fix: No longer errors on version bump if one of the package or bower .json files does not exist.
+
 <h4>v0.0.3</h4>
 
 - Added a .gz gzip compressed output file to the distribution.
