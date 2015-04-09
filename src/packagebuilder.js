@@ -27,7 +27,6 @@ module.exports = function(gulp) {
      * Create
      */
 
-    // Run all units tests.
     gulp.task('create', function(cb) {
         if (fs.existsSync('./src/') !== true)
             fs.mkdirSync('./src/');
@@ -102,7 +101,7 @@ module.exports = function(gulp) {
         }
     }
 
-    gulp.task('alter--version-down', [], function(cb) {
+     gulp.task('alter--version-down', [], function(cb) {
         readPackageFiles();
 
         if (packageObj !== undefined) {
