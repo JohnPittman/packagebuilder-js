@@ -1,9 +1,9 @@
 {
     "name": "chickendinosaur-packagebuilder",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Module to load gulp tasks for testing, minifying, versioning JavaScript packages as well as other file types.",
     "main": "src/packagebuilder.js",
-    "files": ["src/", "config.js", "LICENSE", "README"],
+    "files": ["src/", "config.js", "templates", "LICENSE", "README"],
     "repository": {
         "type": "git",
         "url": "https://github.com/JohnPittman/packagebuilder-js.git"

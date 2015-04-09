@@ -28,17 +28,17 @@ module.exports = function(gulp) {
      */
 
     gulp.task('create', function(cb) {
-        if (fs.existsSync('./src/') !== true)
-            fs.mkdirSync('./src/');
+        if (fs.existsSync(config.paths.SRC) !== true)
+            fs.mkdirSync(config.paths.SRC);
 
         if (fs.existsSync('./README.md') !== true)
             fs.writeFileSync('README.md', '');
 
         if (fs.existsSync('./.gitignore') !== true)
-            fs.writeFileSync('.gitignore', fs.readFileSync('./templates/client_server-gitignore'));
+            fs.writeFileSync('.gitignore', fs.readFileSync(path.join(__dirname, '..', 'templates', 'universal-gitignore')));
 
         if (fs.existsSync('./LICENSE') !== true)
-            fs.writeFileSync('LICENSE', fs.readFileSync('./templates/MIT-LICENSE'));
+            fs.writeFileSync('LICENSE', fs.readFileSync(path.join(__dirname, '..', 'templates', 'MIT-LICENSE')));
 
         return cb();
     });
@@ -101,7 +101,7 @@ module.exports = function(gulp) {
         }
     }
 
-     gulp.task('alter--version-down', [], function(cb) {
+    gulp.task('alter--version-down', [], function(cb) {
         readPackageFiles();
 
         if (packageObj !== undefined) {
@@ -234,55 +234,57 @@ module.exports = function(gulp) {
 
     // Fixes sourcemap linking. 
     gulp.task('build--update-sourcemapLinking', ['build--clean-renamedSourcemaps'], function(cb) {
-        recursiveread(config.paths.DIST, ['node_modules', 'bower_components', '.git'], function(err, files) {
-            for (var i = 0; i < files.length; i++) {
-                var filePath = files[i];
-                // Grab map file to alter.
-                if (filePath.indexOf('.min.map') !== -1) {
-                    // Read file.
-                    var buff = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                    // Clear invlaid sources.
-                    var sources = buff['sources'] = [];
-                    // Get the file name.
-                    // Keep relative path for nested files in src/
-                    // Rip off dist/
-                    var fileName = filePath.split('\\');
-                    fileName.shift();
-                    fileName = fileName.join('\\');
-                    fileName = fileName.split('.');
-                    fileName = fileName[0];
-                    // Make file type js
-                    fileName += '.js';
-                    // Add the source file to the map sources.
-                    sources.push(fileName);
-                    // Back to JSON
-                    buff = JSON.stringify(buff);
-                    // Write the new .map file.
-                    fs.writeFile(filePath, buff);
-                }
-
-                // Grab minified js file to change .map link path.
-                if (filePath.indexOf('.min.js') !== -1) {
-                    // Read file.
-                    var buff = fs.readFileSync(filePath, 'utf8').toString();
-                    // Get file name
-                    var sourceMappingKey = '//# sourceMappingURL=';
-                    var filePathIndex = buff.indexOf(sourceMappingKey);
-                    if (filePathIndex !== -1) {
-                        var currSourceFileName = buff.substring(filePathIndex + sourceMappingKey.length, buff.length);
-                        var buff = buff.substring(0, filePathIndex + sourceMappingKey.length);
-                        // Take out .js.
-                        currSourceFileName = currSourceFileName.split('.');
-                        currSourceFileName.splice(2, 1);
-                        currSourceFileName = currSourceFileName.join('.');
-                        // Update file with new path.
-                        buff += currSourceFileName;
-                        // Write the new .js file.
+        if (fs.existsSync(config.paths.DIST) === true) {
+            recursiveread(config.paths.DIST, ['node_modules', 'bower_components', '.git'], function(err, files) {
+                for (var i = 0; i < files.length; i++) {
+                    var filePath = files[i];
+                    // Grab map file to alter.
+                    if (filePath.indexOf('.min.map') !== -1) {
+                        // Read file.
+                        var buff = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                        // Clear invlaid sources.
+                        var sources = buff['sources'] = [];
+                        // Get the file name.
+                        // Keep relative path for nested files in src/
+                        // Rip off dist/
+                        var fileName = filePath.split('\\');
+                        fileName.shift();
+                        fileName = fileName.join('\\');
+                        fileName = fileName.split('.');
+                        fileName = fileName[0];
+                        // Make file type js
+                        fileName += '.js';
+                        // Add the source file to the map sources.
+                        sources.push(fileName);
+                        // Back to JSON
+                        buff = JSON.stringify(buff);
+                        // Write the new .map file.
                         fs.writeFile(filePath, buff);
                     }
+
+                    // Grab minified js file to change .map link path.
+                    if (filePath.indexOf('.min.js') !== -1) {
+                        // Read file.
+                        var buff = fs.readFileSync(filePath, 'utf8').toString();
+                        // Get file name
+                        var sourceMappingKey = '//# sourceMappingURL=';
+                        var filePathIndex = buff.indexOf(sourceMappingKey);
+                        if (filePathIndex !== -1) {
+                            var currSourceFileName = buff.substring(filePathIndex + sourceMappingKey.length, buff.length);
+                            var buff = buff.substring(0, filePathIndex + sourceMappingKey.length);
+                            // Take out .js.
+                            currSourceFileName = currSourceFileName.split('.');
+                            currSourceFileName.splice(2, 1);
+                            currSourceFileName = currSourceFileName.join('.');
+                            // Update file with new path.
+                            buff += currSourceFileName;
+                            // Write the new .js file.
+                            fs.writeFile(filePath, buff);
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return cb();
     });

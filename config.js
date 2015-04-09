@@ -1,6 +1,6 @@
 module.exports = {
     paths: {
-        ROOT: './',
+        ROOT: '',
         SRC: 'src/',
         JS_SRC: 'src/**/*.js',
         DIST: 'dist/',
