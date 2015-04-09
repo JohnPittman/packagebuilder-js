@@ -1,6 +1,5 @@
 module.exports = {
     paths: {
-        ROOT: '',
         SRC: 'src/',
         JS_SRC: 'src/**/*.js',
         CSS_SRC: 'src/**/*.css',
@@ -14,6 +13,7 @@ module.exports = {
         CSS_BUILD: 'bundle.min.css',
         SOURCE_MAPS: 'dist/**/*.map',
         SPECS: 'test/*Spec.js',
-        PACKAGE_CONFIGS: '*.json'
-    }
+        PACKAGE_CONFIGS: '*.json',
+    },
+    packages: ['bower.json', 'package.json']
 };
