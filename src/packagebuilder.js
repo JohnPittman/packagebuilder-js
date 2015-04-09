@@ -15,103 +15,151 @@ var path = require('path');
 var config = require('./../config.js');
 
 module.exports = function(gulp) {
+    // Variables to store the package .json files
+    var packageObj, bowerObj;
 
-    /**
-     * Tasks
-     */
-
-    gulp.task('default', []);
+    gulp.task('default', ['deploy']);
     gulp.task('test', ['test--unitSpecs']);
     gulp.task('build', ['build--update-sourcemapLinking']);
     gulp.task('deploy', ['deploy--version-up']);
 
     /**
-     * Deploy
+     * Create
      */
 
-    function updateVersion(type, fileName, up) {
-        var versionUp = (up !== undefined) ? up : true;
+    // Run all units tests.
+    gulp.task('create', function(cb) {
+        if (fs.existsSync('./src/') !== true)
+            fs.mkdirSync('./src/');
 
-        // Bump version of package.json and bower.json only
-        var buff = JSON.parse(fs.readFileSync(fileName));
-        // Display current version for the user.
-        console.log(fileName);
-        console.log('Old version: ' + buff.version);
-        var versionTypeValues = buff.version.split('-')[0].split('.');
+        if (fs.existsSync('./README.md') !== true)
+            fs.writeFileSync('README.md', '');
 
-        if (type === 'patch') {
-            var versionTypeNum = parseInt(versionTypeValues[2]);
-            if (versionUp)
-                ++versionTypeNum;
-            else
-                versionTypeNum = (versionTypeNum > 0) ? --versionTypeNum : 0;
-            versionTypeValues[2] = versionTypeNum;
-        } else if (type === 'minor') {
-            var versionTypeNum = parseInt(versionTypeValues[1]);
-            if (versionUp)
-                ++versionTypeNum;
-            else
-                versionTypeNum = (versionTypeNum > 0) ? --versionTypeNum : 0;
-            versionTypeValues[1] = versionTypeNum;
-            versionTypeValues[2] = 0; // Reset patch version.
-        } else if (type === 'major') {
-            var versionTypeNum = parseInt(versionTypeValues[0]);
-            if (versionUp)
-                ++versionTypeNum;
-            else
-                versionTypeNum = (versionTypeNum > 0) ? --versionTypeNum : 0;
-            versionTypeValues[0] = versionTypeNum;
-            versionTypeValues[1] = 0; // Reset minor version.
-            versionTypeValues[2] = 0; // Reset patch version.
+        if (fs.existsSync('./.gitignore') !== true)
+            fs.writeFileSync('.gitignore', fs.readFileSync('./templates/client_server-gitignore'));
+
+        if (fs.existsSync('./LICENSE') !== true)
+            fs.writeFileSync('LICENSE', fs.readFileSync('./templates/MIT-LICENSE'));
+
+        return cb();
+    });
+
+    /**
+     * Modify
+     */
+
+    var readPackageFiles = function() {
+        if (packageObj === undefined)
+            if (fs.existsSync('package.json') === true)
+                packageObj = JSON.parse(fs.readFileSync('package.json'));
+
+        if (bowerObj === undefined)
+            if (fs.existsSync('bower.json') === true)
+                bowerObj = JSON.parse(fs.readFileSync('bower.json'));
+    }
+
+    var writePackageFiles = function() {
+        // Write the new version to .json.
+        if (packageObj !== undefined) {
+            fs.writeFileSync('package.json', JSON.stringify(packageObj));
         }
 
-        var versionStr = versionTypeValues.join('.');
+        if (bowerObj !== undefined) {
+            fs.writeFileSync('bower.json', JSON.stringify(bowerObj));
+        }
 
-        // Write the new version to .json.
-        buff.version = versionStr;
-        buff = JSON.stringify(buff);
-        fs.writeFileSync(fileName, buff);
-
-        // Display new version.
-        console.log('New version: ' + versionStr);
-
-        // Reformat the new files back to easily readable.
+        // Reformat the new files back to being easily readable.
         gulp.src(config.paths.PACKAGE_CONFIGS)
             .pipe(beautify())
             .pipe(gulp.dest('./'));
     }
 
-    // Run all units tests.
-    gulp.task('deploy--version-up', ['build'], function(cb) {
-        gulp.src('package.json')
-            .pipe(prompt.prompt({
-                type: 'checkbox',
-                name: 'bump',
-                message: 'What type of bump would you like to increase the version by? (None)',
-                choices: ['patch', 'minor', 'major'],
-            }, function(res) {
-                var bumpType = res.bump[0];
-                if (fs.existsSync('package.json') === true)
-                    updateVersion(bumpType, 'package.json');
-                if (fs.existsSync('bower.json') === true)
-                    updateVersion(bumpType, 'bower.json');
-            }));
+    function updateVersion(type, version, amount) {
+        var ver = version || '0.0.0';
+        if (amount === 1 ||
+            amount === -1) {
+
+            var versionTypeValues = ver.split('-')[0].split('.');
+
+            if (type === 'patch') {
+                var versionTypeNum = parseInt(versionTypeValues[2]);
+                versionTypeNum = (versionTypeNum > 0) ? versionTypeNum += amount : 0;
+                versionTypeValues[2] = versionTypeNum;
+            } else if (type === 'minor') {
+                var versionTypeNum = parseInt(versionTypeValues[1]);
+                versionTypeNum = (versionTypeNum > 0) ? versionTypeNum += amount : 0;
+                versionTypeValues[1] = versionTypeNum;
+                versionTypeValues[2] = 0; // Reset patch version.
+            } else if (type === 'major') {
+                var versionTypeNum = parseInt(versionTypeValues[0]);
+                versionTypeNum = (versionTypeNum > 0) ? versionTypeNum += amount : 0;
+                versionTypeValues[0] = versionTypeNum;
+                versionTypeValues[1] = 0; // Reset minor version.
+                versionTypeValues[2] = 0; // Reset patch version.
+            }
+
+            return versionTypeValues.join('.');
+        }
+    }
+
+    gulp.task('alter--version-down', [], function(cb) {
+        readPackageFiles();
+
+        if (packageObj !== undefined) {
+            console.log('Version: ' + packageObj.version);
+
+            gulp.src('package.json')
+                .pipe(prompt.prompt({
+                    type: 'checkbox',
+                    name: 'bump',
+                    message: 'What type of bump would you like to increase the version by? (None)',
+                    choices: ['patch', 'minor', 'major'],
+                }, function(res) {
+                    var bumpType = res.bump[0];
+
+                    packageObj.version = updateVersion(bumpType, packageObj.version, -1);
+
+                    if (bowerObj !== undefined)
+                        bowerObj.version = packageObj.version;
+
+                    writePackageFiles();
+
+                    console.log('Version: ' + packageObj.version);
+                }));
+        }
 
         return cb();
     });
 
-    gulp.task('deploy--version-down', [], function(cb) {
-        gulp.src('package.json')
-            .pipe(prompt.prompt({
-                type: 'checkbox',
-                name: 'bump',
-                message: 'What type of bump would you like to increase the version by? (None)',
-                choices: ['patch', 'minor', 'major'],
-            }, function(res) {
-                var bumpType = res.bump[0];
-                updateVersion(bumpType, 'package.json', false);
-                updateVersion(bumpType, 'bower.json', false);
-            }));
+    /**
+     * Deploy
+     */
+
+    gulp.task('deploy--version-up', ['build--update-sourcemapLinking'], function(cb) {
+        readPackageFiles();
+
+        if (packageObj !== undefined) {
+            gulp.src('package.json')
+                .pipe(prompt.prompt({
+                    type: 'checkbox',
+                    name: 'bump',
+                    message: 'What type of bump would you like to increase the version by? (None)',
+                    choices: ['patch', 'minor', 'major'],
+                }, function(res) {
+                    var bumpType = res.bump[0];
+
+                    console.log('Old version: ' + packageObj.version);
+
+                    packageObj.version = updateVersion(bumpType, packageObj.version, 1);
+
+                    if (bowerObj !== undefined)
+                        bowerObj.version = packageObj.version;
+
+                    writePackageFiles();
+
+                    console.log('New version: ' + packageObj.version);
+                }));
+        }
 
         return cb();
     });
@@ -121,7 +169,7 @@ module.exports = function(gulp) {
      */
 
     // Run all units tests.
-    gulp.task('test--unitSpecs', function() {
+    gulp.task('test--unitSpecs', ['create'], function() {
         return gulp.src(config.paths.SPECS)
             .pipe(jasmine());
     });
