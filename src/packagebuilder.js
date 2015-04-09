@@ -7,10 +7,12 @@ var clean = require('gulp-clean');
 var sourcemaps = require('gulp-sourcemaps');
 var prompt = require('gulp-prompt');
 var recursiveread = require('recursive-readdir');
-var beautify = require('gulp-beautify');
 var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
+var minifyCSS = require('gulp-minify-css');
+var minifyHTML = require('gulp-minify-html');
+var prettyData = require('gulp-pretty-data'); // use only for json, sql, xml (not as good compression as other modules);
 
 var config = require('./../config.js');
 
@@ -69,7 +71,9 @@ module.exports = function(gulp) {
 
         // Reformat the new files back to being easily readable.
         gulp.src(config.paths.PACKAGE_CONFIGS)
-            .pipe(beautify())
+            .pipe(prettyData({
+                type: 'prettify'
+            }))
             .pipe(gulp.dest('./'));
     }
 
@@ -107,7 +111,9 @@ module.exports = function(gulp) {
         if (packageObj !== undefined) {
             console.log('Version: ' + packageObj.version);
 
-            gulp.src('package.json')
+            gulp.src('package.json', {
+                    read: false
+                })
                 .pipe(prompt.prompt({
                     type: 'checkbox',
                     name: 'bump',
@@ -138,7 +144,9 @@ module.exports = function(gulp) {
         readPackageFiles();
 
         if (packageObj !== undefined) {
-            gulp.src('package.json')
+            gulp.src('package.json', {
+                    read: false
+                })
                 .pipe(prompt.prompt({
                     type: 'checkbox',
                     name: 'bump',
@@ -186,8 +194,54 @@ module.exports = function(gulp) {
             .pipe(gulp.dest('./'));
     });
 
+    // Minify xml
+    gulp.task('build--compress-min-xml', ['build--clean-dist'], function() {
+        return gulp.src(config.paths.XML_SRC)
+            .pipe(rename(function(path) {
+                path.extname = '.min.xml'
+            }))
+            .pipe(prettyData({
+                type: 'minify'
+            }))
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
+    // Minify json
+    gulp.task('build--compress-min-json', ['build--compress-min-xml'], function() {
+        return gulp.src(config.paths.JSON_SRC)
+            .pipe(rename(function(path) {
+                path.extname = '.min.json'
+            }))
+            .pipe(prettyData({
+                type: 'minify'
+            }))
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
+    // Minify CSS.
+    gulp.task('build--compress-min-css', ['build--compress-min-json'], function() {
+        return gulp.src(config.paths.CSS_SRC)
+            .pipe(rename(function(path) {
+                path.extname = '.min.css'
+            }))
+            .pipe(minifyCSS())
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
+    // Minify HTML
+    gulp.task('build--compress-min-html', ['build--compress-min-css'], function() {
+        var opts = {
+            conditionals: true,
+            spare: true
+        };
+
+        return gulp.src(config.paths.HTML_SRC)
+            .pipe(minifyHTML(opts))
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
     // Minify JS with source maps and generate source maps.
-    gulp.task('build--compress-min', ['build--clean-dist'], function() {
+    gulp.task('build--compress-min-js', ['build--compress-min-html'], function() {
         return gulp.src(config.paths.JS_SRC)
             .pipe(rename(function(path) {
                 path.extname = '.min.js'
@@ -201,11 +255,8 @@ module.exports = function(gulp) {
     });
 
     // Minify JS with source maps and generate source maps.
-    gulp.task('build--compress-gzip', ['build--compress-min'], function() {
-        return gulp.src(config.paths.JS_DIST)
-            .pipe(rename(function(path) {
-                path.extname = ''
-            }))
+    gulp.task('build--compress-gzip', ['build--compress-min-js'], function() {
+        return gulp.src(config.paths.TEXT_DIST)
             .pipe(gzip({
                 append: true,
                 threshold: false
