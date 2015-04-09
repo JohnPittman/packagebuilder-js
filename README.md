@@ -15,7 +15,7 @@ Node module for cranking out JavaScript packages. Builds with front-end source m
 
 Each process is dependent upon the previous. If one fails the build process exits.
 
-- gulp
+- gulp (Creates .gitignore, MIT LICENSE, README.md, and src folder if they're not created. Runs gulp deploy).
 - gulp test (Unit specifications)
 - gulp build (Test, folder clean-ups, minification, source maps, renaming)
 - gulp deploy (Test, build, versioning)
@@ -32,13 +32,13 @@ npm: npm install chickendinosaur-packagebuilder
 <h4>How to use...</h4>
 
 - npm install gulp --save-dev. (recommended to put the version as '*' to always install the latest)
-- npm install packagebuilder --save-dev. (recommended to put the version as '*' to always install the latest)
-- Create gulpfile.js in the root directory of the project this is being used for.
+- npm install chickendinosaur-packagebuilder --save-dev. (recommended to put the version as '*' to always install the latest)
+- Create gulpfile.js in the root directory of the project.
 - In the gulpfile.js copy and paste this line:
 
     require('chickendinosaur-packagebuilder')(require('gulp'));
 
-Now you can open up a terminal in the project folder and run any of the gulp tasks listed in the Gulp Commands section above on the project.
+Now you can open up a terminal in the project folder and run any of the gulp tasks listed in the Gulp Commands section above on the project. 
 
 Note: Right now the source directory that the build needs is src/ in the main project directory which is the location of all the JavaScript that needs to get processed in the build task. You can change the locations of source files, distribution folder, etc. manually in the config.js that's included in the packagebuilder module under node_modules. However, this will be overwritten each time you reinstalled the package at the moment.
 

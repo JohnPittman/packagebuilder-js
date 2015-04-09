@@ -1,6 +1,6 @@
 {
   "name": "chickendinosaur-packagebuilder",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Module to load gulp tasks for testing, minifying, versioning JavaScript packages as well as other file types.",
   "main": "src/packagebuilder.js",
   "files": [
@@ -33,6 +33,7 @@
   "dependencies": {
     "gulp": "^3.8.11",
     "gulp-clean": "^0.3.1",
+    "gulp-concat-css": "^2.2.0",
     "gulp-gzip": "^1.1.0",
     "gulp-jasmine": "^1.0.1",
     "gulp-minify-css": "^1.0.0",

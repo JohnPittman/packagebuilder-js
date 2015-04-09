@@ -10,6 +10,7 @@ var recursiveread = require('recursive-readdir');
 var gzip = require('gulp-gzip');
 var fs = require('fs');
 var path = require('path');
+var concatCSS = require('gulp-concat-css');
 var minifyCSS = require('gulp-minify-css');
 var minifyHTML = require('gulp-minify-html');
 var prettyData = require('gulp-pretty-data'); // use only for json, sql, xml (not as good compression as other modules);
@@ -218,12 +219,16 @@ module.exports = function(gulp) {
             .pipe(gulp.dest(config.paths.DIST));
     });
 
-    // Minify CSS.
-    gulp.task('build--compress-min-css', ['build--compress-min-json'], function() {
+    // Concat CSS
+    gulp.task('build--concat-css', ['build--compress-min-json'], function() {
         return gulp.src(config.paths.CSS_SRC)
-            .pipe(rename(function(path) {
-                path.extname = '.min.css'
-            }))
+            .pipe(concatCSS(config.paths.CSS_BUILD))
+            .pipe(gulp.dest(config.paths.DIST));
+    });
+
+    // Minify CSS.
+    gulp.task('build--compress-min-css', ['build--concat-css'], function() {
+        return gulp.src(config.paths.CSS_DIST)
             .pipe(minifyCSS())
             .pipe(gulp.dest(config.paths.DIST));
     });
